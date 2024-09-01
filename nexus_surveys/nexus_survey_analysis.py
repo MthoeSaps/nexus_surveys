@@ -1,29 +1,17 @@
 import streamlit as st
 import pandas as pd
-import os
+import requests
 from PIL import Image
 import plotly.express as px
 
 st.set_page_config(page_title="N.E.X.U.S Survey Analysis", initial_sidebar_state="expanded", page_icon="🧠", layout="wide")
 
-# Define the CSV file path
-csv_file_path = os.path.expanduser("nexus_surveys/databases/nexus_survey_data/responses.csv")
+# Define the CSV file URL
+csv_file_url = "https://raw.githubusercontent.com/MthoeSaps/nexus_surveys/main/nexus_surveys/databases/nexus_survey_data/responses.csv"
 
-# Check if the CSV file exists
-if not os.path.exists(csv_file_path):
-    # Create an empty DataFrame if the file does not exist
-    df = pd.DataFrame(columns=[
-        "timestamp", "suburb", "gender", "age", "challenges", "improvements", 
-        "key_assets", "leverage_strengths", "land_use", "zoning_feedback", 
-        "housing_needs", "mix_housing_options", "transport_improvements", 
-        "sustainable_mobility", "commercial_support", "maximize_benefits", 
-        "environmental_concerns", "sustainable_design", "engagement_methods", 
-        "fostering_ownership"
-    ])
-    df.to_csv(csv_file_path, index=False)
-else:
-    # Load the data from the CSV file
-    df = pd.read_csv(csv_file_path)
+# Load the data from the CSV file
+try:
+    df = pd.read_csv(csv_file_url)
 
     # Convert relevant columns to strings and fill NaN values
     columns_to_convert = [
@@ -40,6 +28,17 @@ else:
     # Convert 'age' column to numeric and handle NaN values
     if 'age' in df.columns:
         df['age'] = pd.to_numeric(df['age'], errors='coerce').fillna(0).astype(int)
+
+except Exception as e:
+    st.error("Error loading data: {}".format(e))
+    df = pd.DataFrame(columns=[
+        "timestamp", "suburb", "gender", "age", "challenges", "improvements", 
+        "key_assets", "leverage_strengths", "land_use", "zoning_feedback", 
+        "housing_needs", "mix_housing_options", "transport_improvements", 
+        "sustainable_mobility", "commercial_support", "maximize_benefits", 
+        "environmental_concerns", "sustainable_design", "engagement_methods", 
+        "fostering_ownership"
+    ])
 
 # Custom CSS for metrics styling
 st.markdown("""
@@ -111,7 +110,6 @@ with col1:
     if st.button(":blue[Delete Last Entry]"):
         if len(df) > 0:
             df = df[:-1]  # Remove the last entry
-            df.to_csv(csv_file_path, index=False)
             st.success("Last entry deleted.")
         else:
             st.warning("No entries to delete.")
@@ -119,7 +117,6 @@ with col1:
 with col2:
     if st.button(":orange[Clear Database]"):
         df = pd.DataFrame(columns=columns_to_convert)
-        df.to_csv(csv_file_path, index=False)
         st.success("Database cleared.")
 
 # Function to filter data based on user selection
