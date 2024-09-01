@@ -8,11 +8,12 @@ st.set_page_config(page_title="N.E.X.U.S Survey", initial_sidebar_state="expande
 
 # Define the CSV file path
 csv_file_path = os.path.expanduser("nexus_surveys/databases/nexus_survey_data/responses.csv")
+csv_dir = os.path.dirname(csv_file_path)
 
 # Create the directory if it doesn't exist
-csv_dir = os.path.dirname(csv_file_path)
 if not os.path.exists(csv_dir):
     os.makedirs(csv_dir)
+    st.write(f"Created directory: {csv_dir}")
 
 # Initialize CSV file with headers if it doesn't exist
 if not os.path.exists(csv_file_path):
@@ -31,13 +32,13 @@ suburbs_file_path = "nexus_surveys/database/suburbs.xlsx"
 suburbs = []
 if os.path.exists(suburbs_file_path):
     df = pd.read_excel(suburbs_file_path)
-    suburbs = df['suburb'].dropna().tolist()  # Ensure 'Suburb' column exists
+    suburbs = df['suburb'].dropna().tolist()  # Ensure 'suburb' column exists
 
 if not suburbs:
     st.error("No suburbs available for selection. Please check the suburbs file.")
 else:
-    # Title of the app
     st.title("🧠:blue[Nexus] Community Survey")
+    
     col1, col2 = st.columns([5, 3])
     col1.write("*- Software developed by Mthoe Saps Construction technologies*")
     col2.write("*- Prototype developed on 30-08-2024*")
@@ -154,48 +155,45 @@ else:
     )
 
     # Submit Button
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        if st.button("Submit Survey"):
-            # Collect all responses
-            response_data = {
-                "timestamp": datetime.now().isoformat(),
-                "suburb": suburb,
-                "gender": gender,
-                "employment_status": employment_status,
-                "age": age,
-                "challenges": ', '.join(challenges),
-                "improvements": ', '.join(improvements),
-                "key_assets": ', '.join(key_assets),
-                "leverage_strengths": ', '.join(leverage_strengths),
-                "land_use": land_use,
-                "zoning_feedback": ', '.join(zoning_feedback),
-                "housing_needs": ', '.join(housing_needs),
-                "mix_housing_options": ', '.join(mix_housing_options),
-                "transport_improvements": ', '.join(transport_improvements),
-                "sustainable_mobility": ', '.join(sustainable_mobility),
-                "commercial_support": ', '.join(commercial_support),
-                "maximize_benefits": ', '.join(maximize_benefits),
-                "environmental_concerns": ', '.join(environmental_concerns),
-                "sustainable_design": ', '.join(sustainable_design),
-                "engagement_methods": ', '.join(engagement_methods),
-                "fostering_ownership": ', '.join(fostering_ownership)
-            }
+    if st.button("Submit Survey"):
+        # Collect all responses
+        response_data = {
+            "timestamp": datetime.now().isoformat(),
+            "suburb": suburb,
+            "gender": gender,
+            "employment_status": employment_status,
+            "age": age,
+            "challenges": ', '.join(challenges),
+            "improvements": ', '.join(improvements),
+            "key_assets": ', '.join(key_assets),
+            "leverage_strengths": ', '.join(leverage_strengths),
+            "land_use": land_use,
+            "zoning_feedback": ', '.join(zoning_feedback),
+            "housing_needs": ', '.join(housing_needs),
+            "mix_housing_options": ', '.join(mix_housing_options),
+            "transport_improvements": ', '.join(transport_improvements),
+            "sustainable_mobility": ', '.join(sustainable_mobility),
+            "commercial_support": ', '.join(commercial_support),
+            "maximize_benefits": ', '.join(maximize_benefits),
+            "environmental_concerns": ', '.join(environmental_concerns),
+            "sustainable_design": ', '.join(sustainable_design),
+            "engagement_methods": ', '.join(engagement_methods),
+            "fostering_ownership": ', '.join(fostering_ownership)
+        }
 
-            # Debug: Print response data
-            st.write("Response Data:", response_data)
+        # Debug: Print response data
+        st.write("Response Data:", response_data)
 
-            # Load existing data and append the new response
-            try:
-                df = pd.read_csv(csv_file_path)
-                df.loc[len(df)] = response_data 
-                df.to_csv(csv_file_path, index=False)
-                st.success("Data saved successfully!")
-            except Exception as e:
-                st.error(f"Error saving data: {e}")
+        # Load existing data and append the new response
+        try:
+            df = pd.read_csv(csv_file_path)
+            st.write("Existing data loaded, shape:", df.shape)  # Check existing data shape
 
-    with col2:
-        st.empty()
+            df.loc[len(df)] = response_data 
+            df.to_csv(csv_file_path, index=False)
+            st.success("Data saved successfully!")
+        except Exception as e:
+            st.error(f"Error saving data: {e}")
 
     st.divider()
 
