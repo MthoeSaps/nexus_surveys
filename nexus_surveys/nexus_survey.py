@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import os
-import plotly.express as px
-import time
 from datetime import datetime
 from PIL import Image
 
@@ -183,33 +181,26 @@ else:
                 "engagement_methods": ', '.join(engagement_methods),
                 "fostering_ownership": ', '.join(fostering_ownership)
             }
-            
-            # Load existing data and append the new response
-            df = pd.read_csv(csv_file_path)
-            df.loc[len(df)] = response_data 
-            df.to_csv(csv_file_path, index=False)
 
-            st.markdown(
-                """
-                <div style="border: 2px solid blue; background-color: orange; padding: 10px; border-radius: 5px; margin-top: 20px;">
-                    <strong>Thank you for your responses!</strong> Your feedback has been recorded.
-                </div>
-                """,
-                unsafe_allow_html=True
-            ) 
-            #st.toast("Thank you for your responses! Your feedback has been recorded.")
-            #time.sleep(10)
-    
+            # Debug: Print response data
+            st.write("Response Data:", response_data)
+
+            # Load existing data and append the new response
+            try:
+                df = pd.read_csv(csv_file_path)
+                df.loc[len(df)] = response_data 
+                df.to_csv(csv_file_path, index=False)
+                st.success("Data saved successfully!")
+            except Exception as e:
+                st.error(f"Error saving data: {e}")
+
     with col2:
         st.empty()
-        #if st.button("Clear Fields"):
-         #   st.session_state.clear()
-          #  st.experimental_rerun()
 
     st.divider()
-    
+
     st.info("If you are interested in gaining understanding of the survey data, follow our social media platforms and also our main blog page.")
-    
+
 with st.sidebar:
     # Display Nexus logo
     image_path = "nexus_surveys/images/logo9.png"
@@ -223,20 +214,20 @@ with st.sidebar:
             "The **Nexus Community Survey** is an initiative aimed at gathering valuable insights from residents of Bulawayo regarding land development and community needs. "
             "This interactive survey allows community members to express their thoughts on various topics."
         )
-    
+
     with st.expander("Purpose 🎯"):
         st.write(
             "The data collected through this survey will help Nexus and local authorities make informed decisions that align with the community’s priorities and aspirations. "
             "By participating, you contribute to shaping a better future for Bulawayo."
         )
-    
+
     with st.expander("How It Works ⚙️"):
         st.write(
             "1. **Select Your Suburb**: Choose your area of residence from a dropdown list.\n"
             "2. **Answer Questions**: Respond to questions regarding your challenges, preferences, and suggestions.\n"
             "3. **Submit Your Feedback**: Once completed, submit your responses, which will be recorded for analysis."
         )
-    
+
     with st.expander("Community Challenges 🚧"):
         st.write(
             "This section allows residents to identify the biggest issues facing their neighborhoods, such as:\n"
@@ -262,12 +253,12 @@ with st.sidebar:
             "- Tourism development\n"
             "By sharing your thoughts, you can help shape economic policies that benefit the community."
         )
-    
+
     with st.expander("Participation 🙌"):
         st.write(
             "Your voice matters! Thank you for taking the time to participate in this important initiative."
         )
-    
+
     with st.container(border=True):
         st.subheader("Get in touch with us📞", divider=True)
         selected_option = st.selectbox("Select Contact Method", ["WhatsApp", "LinkedIn", "Instagram"])
